@@ -49,6 +49,8 @@ int snap(FILE * fp, void const * op, size_t op_l);
 void make_data(void);
 void copy_data(void);
 void check_data(void);
+void string_it(void);
+
 
 static
 std::vector<octet> const indata {
@@ -69,13 +71,26 @@ auto const ofile = "junkie"s;
  *  MARK:  main()
  */
 int main(int argc, char const * argv[]) {
+  std::cout << "In function "s
+            << __func__ << "()\n"s;
+
   int RC { EXIT_SUCCESS };
+
+  std::cout << std::string(40, '.') << '\n';
   snap(stdout, indata.data(), indata.size());
 
   try {
+    std::cout << std::string(40, '.') << '\n';
     make_data();
+
+    std::cout << std::string(40, '.') << '\n';
     copy_data();
+
+    std::cout << std::string(40, '.') << '\n';
     check_data();
+
+    std::cout << std::string(40, '.') << '\n';
+    string_it();
   }
   catch (std::exception & ex) {
     std::cout << "GRONK!: "s << ex.what() << '\n';
@@ -85,10 +100,13 @@ int main(int argc, char const * argv[]) {
   return RC;
 }
 
+/*
+ *  MARK:  copy_data()
+ */
 void copy_data(void) {
   std::cout << "In function "s
             << __func__ << "()\n"s;
-  uint8_t ch;
+  uint8_t ch = EOF;
   std::ifstream innie(ifile, std::ios::binary);
   std::ofstream outie(ofile, std::ios::binary);
 
@@ -121,6 +139,9 @@ void copy_data(void) {
   return;
 }
 
+/*
+ *  MARK:  make_data()
+ */
 void make_data(void) {
   std::cout << "In function "s
             << __func__ << "()\n"s;
@@ -142,13 +163,16 @@ void make_data(void) {
   return;
 }
 
+/*
+ *  MARK:  check_data()
+ */
 void check_data(void) {
   std::cout << "In function "s
             << __func__ << "()\n"s;
   std::ifstream iff(ofile, std::ios::binary);
   if (iff.is_open()) {
     std::vector<uint8_t> chex;
-    uint8_t ch;
+    uint8_t ch = EOF;
     while (true) {
       ch = iff.get();
       if (iff.eof()) {
@@ -166,6 +190,40 @@ void check_data(void) {
         << ofile; 
     throw std::runtime_error(err.str());    
   }
+
+  return;
+}
+
+/*
+ *  MARK:  string_it()
+ */
+void string_it(void) {
+  std::cout << "In function "s
+            << __func__ << "()\n"s;
+  std::stringstream id(
+      std::ios_base::in
+    | std::ios_base::out
+    | std::ios_base::binary);
+  for (auto ch : indata) {
+    id.put(ch);
+  }
+
+  snap(stdout, id.str().data(), id.str().size());
+
+  std::ostringstream tgt(
+      std::ios_base::out
+    | std::ios_base::binary);
+
+  uint8_t ch = EOF;
+  while (true) {
+    ch = id.get();
+    if (id.eof()) {
+      break;
+    }
+    tgt << ch;
+  }
+  
+  snap(stdout, tgt.str().data(), tgt.str().size());
 
   return;
 }
