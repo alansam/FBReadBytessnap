@@ -124,7 +124,7 @@ void copy_data(void) {
   }
   else {
     std::ostringstream err;
-    if (innie.is_open()) {
+    if (!innie.is_open()) {
       err << "Unable to open target file: "s
           << ifile;
     }
